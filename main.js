@@ -28,6 +28,14 @@ program
     }
   });
 
+  
+  
+  
+  const realm = await (await db.getRealms()).get();
+  console.log("realm", realm);
+  await tsm.getPrices(realm.id, realm.id, realm.region1, tsmLib.TSM_PRICE_SOURCE_HISTORICAL);
+
+
 })();
 
 
