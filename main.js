@@ -1,8 +1,8 @@
 const program = require('commander');
 const Database = require('./lib/db');
 const db = new Database();
-const TSM = require('./lib/tsm');
-const tsm = new TSM();
+const tsmLib = require('./lib/tsm');
+const tsm = new tsmLib.TSM();
 
 program
   .version("0.0.1")
