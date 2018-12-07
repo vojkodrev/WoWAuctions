@@ -1,13 +1,7 @@
-// const program = require('commander');
 const Database = require('./lib/db');
 const db = new Database();
 const tsmLib = require('./lib/tsm');
 const tsm = new tsmLib.TSM();
-const from = require('rxjs').from;
-const take = require('rxjs/operators').take;
-const map = require('rxjs/operators').map;
-const bufferCount = require('rxjs/operators').bufferCount;
-const of = require('rxjs').of;
 const delay = require('delay');
 
 (async () => {
@@ -25,13 +19,13 @@ const delay = require('delay');
     }
   });
 
-  let priceSources = [
+  const priceSources = [
     tsmLib.TSM_PRICE_SOURCE_MIN_BUYOUT,
     tsmLib.TSM_PRICE_SOURCE_MARKET,
     tsmLib.TSM_PRICE_SOURCE_HISTORICAL
   ];
 
-  let realms = await (await db.getRealms("EU")).all();
+  const realms = await (await db.getRealms("EU")).all();
 
   for (let i = 0; i < realms.length; i++) {
     if (i > 0 && i % 2 == 0)
