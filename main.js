@@ -25,34 +25,30 @@ const delay = require('delay');
     }
   });
 
-  let splitRelams = [];
-  from(await (await db.getRealms("EU")).all()).pipe(
-    bufferCount(2),
-  ).subscribe(i => splitRelams.push(i));
+  let priceSources = [
+    tsmLib.TSM_PRICE_SOURCE_MIN_BUYOUT,
+    tsmLib.TSM_PRICE_SOURCE_MARKET,
+    tsmLib.TSM_PRICE_SOURCE_HISTORICAL
+  ];
 
-  for (let i = 0; i < splitRelams.length; i++) {
-    const group = splitRelams[i];
+  let realms = await (await db.getRealms("EU")).all();
+
+  for (let i = 0; i < realms.length; i++) {
+    if (i > 0 && i % 2 == 0)
+      await delay(5000);
+
+    const realm = realms[i];
     
-    group.forEach(realm => {
-      let priceSources = [
-        tsmLib.TSM_PRICE_SOURCE_MIN_BUYOUT,
-        tsmLib.TSM_PRICE_SOURCE_MARKET,
-        tsmLib.TSM_PRICE_SOURCE_HISTORICAL
-      ];
-
-      priceSources.forEach(async priceSource => {
-        const prices = await tsm.getPrices(realm.id, realm.id, realm.region1, priceSource);
-        prices.forEach(async price => {
-          try {
-            await db.insertPrice(price.price, priceSource, price.petName, realm.id);
-          } catch (ex) {
-            console.error("error while inserting price", price.price, priceSource, price.petName, realm.id, ex);
-          }
-        });
+    priceSources.forEach(async priceSource => {
+      const prices = await tsm.getPrices(realm.id, realm.id, realm.region1, priceSource);
+      prices.forEach(async price => {
+        try {
+          await db.insertPrice(price.price, priceSource, price.petName, realm.id);
+        } catch (ex) {
+          console.error("error while inserting price", price.price, priceSource, price.petName, realm.id, ex);
+        }
       });
     });
-
-    await delay(5000);
   }
 })();
 

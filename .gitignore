@@ -79,3 +79,4 @@ typings/
 .dynamodb/ 
 
 db.sqlite
+db.sqlite-journal
