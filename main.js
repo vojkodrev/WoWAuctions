@@ -7,7 +7,6 @@ const from = require('rxjs').from;
 const take = require('rxjs/operators').take;
 const map = require('rxjs/operators').map;
 const bufferCount = require('rxjs/operators').bufferCount;
-// const delay = require('rxjs/operators').delay;
 const of = require('rxjs').of;
 const delay = require('delay');
 
@@ -35,12 +34,6 @@ program
     }
   });
 
-  // let petId = await db.insertPet("moo");
-  // console.log("petId", petId);
-
-  // petId = await db.insertPet("moo");
-  // console.log("petId", petId);  
-
   let splitRelams = [];
   from(await (await db.getRealms("EU")).all()).pipe(
     bufferCount(5),
@@ -50,7 +43,7 @@ program
     const group = splitRelams[i];
     
     group.forEach(async realm => {
-      let priceSource = tsmLib.TSM_PRICE_SOURCE_HISTORICAL;
+      let priceSource = tsmLib.TSM_PRICE_SOURCE_MARKET;
       const prices = await tsm.getPrices(realm.id, realm.id, realm.region1, priceSource);
       prices.forEach(async price => {
         try {
@@ -63,43 +56,6 @@ program
 
     await delay(5000);
   }
-
-  // Observable.create(o => {
-  //   (await db.getRealms("EU")).each(async (e, realm) => {
-  //     o.next(realm);
-  //   });
-
-  //   o.complete();
-  // })
-  // .pipe(
-  //   take(5),
-  //   map(r => {
-  //     console.log(r);
-  //   }));
-  
-  // let counter = 0;
-  // (await db.getRealms("EU")).each(async (e, realm) => {
-  //   if (counter > 1)
-  //     return;
-
-  //   let priceSource = tsmLib.TSM_PRICE_SOURCE_HISTORICAL;
-  //   counter++;  
-  //   // console.log("realm", realm);
-  //   const prices = await tsm.getPrices(realm.id, realm.id, realm.region1, priceSource);
-  //   prices.forEach(async price => {
-  //     try {
-  //       await db.insertPrice(price.price, priceSource, price.petName, realm.id);
-  //     } catch (ex) {
-  //       console.error("error while inserting price", price.price, priceSource, price.petName, realm.id, ex);
-  //     }
-      
-  //   })
-  //   console.log(prices);
-  // });
-  
-
-
-
 })();
 
 
