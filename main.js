@@ -1,4 +1,4 @@
-const program = require('commander');
+// const program = require('commander');
 const Database = require('./lib/db');
 const db = new Database();
 const tsmLib = require('./lib/tsm');
@@ -10,21 +10,12 @@ const bufferCount = require('rxjs/operators').bufferCount;
 const of = require('rxjs').of;
 const delay = require('delay');
 
-program
-  .version("0.0.1")
-  .option("-r --reset", "Resets data")
-  .parse(process.argv);
-
 (async () => {
 
-  if (program.reset) {
-    console.log("reset parameter enabled");
-    await db.remove();
-    await db.open();  
-    await db.createTables();
-  } else {
-    await db.open();
-  }
+  console.log("reset parameter enabled");
+  await db.remove();
+  await db.open();  
+  await db.createTables();
     
   (await tsm.getRealms()).forEach(async (e) => {
     try {
@@ -42,19 +33,25 @@ program
   for (let i = 0; i < splitRelams.length; i++) {
     const group = splitRelams[i];
     
-    group.forEach(async realm => {
-      let priceSource = tsmLib.TSM_PRICE_SOURCE_MARKET;
-      const prices = await tsm.getPrices(realm.id, realm.id, realm.region1, priceSource);
-      prices.forEach(async price => {
-        try {
-          await db.insertPrice(price.price, priceSource, price.petName, realm.id);
-        } catch (ex) {
-          console.error("error while inserting price", price.price, priceSource, price.petName, realm.id, ex);
-        }
+    group.forEach(realm => {
+      let priceSources = [
+        tsmLib.TSM_PRICE_SOURCE_MIN_BUYOUT,
+        tsmLib.TSM_PRICE_SOURCE_HISTORICAL
+      ];
+
+      priceSources.forEach(async priceSource => {
+        const prices = await tsm.getPrices(realm.id, realm.id, realm.region1, priceSource);
+        prices.forEach(async price => {
+          try {
+            await db.insertPrice(price.price, priceSource, price.petName, realm.id);
+          } catch (ex) {
+            console.error("error while inserting price", price.price, priceSource, price.petName, realm.id, ex);
+          }
+        });
       });
     });
 
-    await delay(5000);
+    await delay(8000);
   }
 })();
 
