@@ -27,7 +27,7 @@ const delay = require('delay');
 
   let splitRelams = [];
   from(await (await db.getRealms("EU")).all()).pipe(
-    bufferCount(5),
+    bufferCount(2),
   ).subscribe(i => splitRelams.push(i));
 
   for (let i = 0; i < splitRelams.length; i++) {
@@ -36,6 +36,7 @@ const delay = require('delay');
     group.forEach(realm => {
       let priceSources = [
         tsmLib.TSM_PRICE_SOURCE_MIN_BUYOUT,
+        tsmLib.TSM_PRICE_SOURCE_MARKET,
         tsmLib.TSM_PRICE_SOURCE_HISTORICAL
       ];
 
@@ -51,7 +52,7 @@ const delay = require('delay');
       });
     });
 
-    await delay(8000);
+    await delay(5000);
   }
 })();
 
