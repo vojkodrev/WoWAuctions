@@ -6,7 +6,6 @@ const delay = require('delay');
 
 (async () => {
 
-  console.log("reset parameter enabled");
   await db.remove();
   await db.open();  
   await db.createTables();
@@ -28,7 +27,7 @@ const delay = require('delay');
   const realms = await (await db.getRealms("EU")).all();
 
   for (let i = 0; i < realms.length; i++) {
-    if (i > 0 && i % 2 == 0)
+    if (i > 0 && i % 5 == 0)
       await delay(5000);
 
     const realm = realms[i];
